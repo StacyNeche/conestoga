@@ -1,0 +1,23 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+
+exporters:
+  otlp:
+    endpoint: http://otel-collector:4317
+    compression: gzip
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp]
+      exporters: [otlp]
+    logs:
+      receivers: [otlp]
+      exporters: [otlp]
