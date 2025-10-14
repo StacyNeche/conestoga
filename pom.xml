@@ -31,13 +31,6 @@
       <version>1.28.0</version>
     </dependency>
 
-    <!-- OpenTelemetry SDK Autoconfigure (for simple setup via code) -->
-    <dependency>
-    <groupId>io.opentelemetry</groupId>
-    <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
-    <version>1.27.0</version> <!-- use the latest stable version -->
-    </dependency>
-
     <!-- OTLP exporter -->
     <dependency>
       <groupId>io.opentelemetry</groupId>
