@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @RestController
 public class DataController {
 
@@ -22,11 +24,18 @@ public class DataController {
             .setUnit("1")
             .build();
 
+    // In-memory counters for Task 2
+    private final AtomicInteger inMemoryRequestCount = new AtomicInteger(0);
+    private final AtomicInteger inMemoryFailedCount = new AtomicInteger(0);
+    private final AtomicInteger totalResponseTimeMs = new AtomicInteger(0);
+
     @GetMapping("/data")
     public String getData() {
+        long startTime = System.currentTimeMillis();
+        inMemoryRequestCount.incrementAndGet(); // increment request counter
         logger.info("Request received at /data endpoint");
 
-        // Increment metric
+        // Increment OpenTelemetry metric (if configured)
         try {
             requestCounter.add(1);
         } catch (Exception e) {
@@ -37,15 +46,39 @@ public class DataController {
         try {
             logger.info("Starting slow operation...");
             Thread.sleep(2000); // simulate slow work
+
+            // Simulate occasional failure
+            if (Math.random() < 0.2) {
+                inMemoryFailedCount.incrementAndGet();
+                throw new RuntimeException("Simulated failure");
+            }
+
             logger.info("Slow operation completed");
-        } catch (InterruptedException e) {
-            logger.error("Error during slow operation", e);
-            Thread.currentThread().interrupt();
+            return "Processed data successfully!";
+        } catch (Exception e) {
+            inMemoryFailedCount.incrementAndGet();
+            logger.error("Error during /data processing: {}", e.getMessage());
+            return "Error processing data: " + e.getMessage();
         } finally {
             slowSpan.end();
-        }
+            long duration = System.currentTimeMillis() - startTime;
+            totalResponseTimeMs.addAndGet((int) duration);
 
-        logger.info("Returning response from /data");
-        return "Processed data successfully!";
+            logger.info("Request #{} | Duration: {} ms | Failed: {}",
+                    inMemoryRequestCount.get(),
+                    duration,
+                    inMemoryFailedCount.get());
+        }
+    }
+
+    @GetMapping("/metrics")
+    public String getMetrics() {
+        int completedRequests = inMemoryRequestCount.get() - inMemoryFailedCount.get();
+        double avgResponseTime = completedRequests > 0 ?
+                ((double) totalResponseTimeMs.get() / completedRequests) : 0.0;
+
+        return "Total Requests: " + inMemoryRequestCount.get() +
+                " | Failed Requests: " + inMemoryFailedCount.get() +
+                " | Average Response Time: " + avgResponseTime + " ms";
     }
 }
