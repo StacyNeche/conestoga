@@ -1,0 +1,8 @@
+products/products/node_modules
+products/products/.angular
+products/products/.vscode
+
+shell/shell/node_modules
+shell/shell/.angular
+shell/shell/.vscode
+
