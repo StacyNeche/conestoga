@@ -1,0 +1,17 @@
+{
+  "name": "products-app",
+  "version": "1.0.0",
+  "description": "Full-stack products app",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "concurrently \"cd server && npm start\" \"cd client && npm start\"",
+    "build": "cd client && npm run build"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "cors": "^2.8.6"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
