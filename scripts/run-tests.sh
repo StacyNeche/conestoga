@@ -27,6 +27,9 @@ fi
 #   exit 1
 # fi
 
+if ! grep -q "copyrights" myapp/index.html; then
+  echo "ERROR: 'copyrights' keyword not found in footer of index.html." >&2
+  exit 1
+fi
 
-
-echo "All required files are present and passed."
+echo "All required files are present and checks passed."
